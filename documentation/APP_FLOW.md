@@ -1,159 +1,440 @@
-# APPLICATION FLOW & USER JOURNEYS
-## DFM Korba Official Mobile Application
-
-This document maps out the state machines, screen transitions, and detailed end-to-end user journeys for the DFM Korba Official App, grounded directly in the reference architectural specification.
+# APPLICATION FLOW & NAVIGATION ARCHITECTURE (APP_FLOW.md)
+## DFM KORBA OFFICIAL MOBILE APPLICATION
+### Complete Screen Inventory, Role-Based State Machines & Navigation Specifications
 
 ---
 
-### High-Level Architectural Flowchart
+| Document Metadata | Value |
+|---|---|
+| **Document Title** | Application Flow & Navigation Architecture |
+| **Document Version** | 2.0.0 (Master Navigation Specification) |
+| **System** | DFM Korba Official Mobile Application |
+| **Platforms** | Android & iOS (Cross-Platform Flutter Client) |
+| **Authorization Paradigm** | Server-Validated Role-Based Access Control (RBAC) |
+| **Status** | Approved Master Specification |
+
+---
+
+## 1. Complete Master Screen Inventory & Security Registry
+
+The DFM Korba Official App contains **30 distinct screens** cataloged in the registry below. Direct navigation or deep linking to any protected screen without an authenticated, active session token carrying the requisite role is intercepted and routed to the `RoleSelectionScreen`.
+
+| Screen ID | Screen Name | Route Path | Access Permission | Entry Conditions | Exit Conditions |
+|---|---|---|---|---|---|
+| **SCR-01** | Splash Screen | `/splash` | Public | App launched / process restarted | Bootstrap initialized ($\le 2.2\text{s}$) |
+| **SCR-02** | Role Selection Screen | `/role_select` | Public | Unauthenticated or user logged out | User selects role or clicks public feed |
+| **SCR-03** | Public Home Screen | `/public/home` | Public | Visited from role select or bottom bar | Navigates to catalog, gallery or login |
+| **SCR-04** | Course Catalog Screen | `/public/courses` | Public | Taps "Courses" from public feed | Selects course or returns home |
+| **SCR-05** | Public Gallery Screen | `/public/gallery` | Public | Taps "Gallery" from public feed | Inspects media or returns home |
+| **SCR-06** | Leaderboard Screen | `/public/leaderboard` | Public | Taps "Top Teams" / "Top Students" | Returns to home or selects squad |
+| **SCR-07** | About & Policy Screen | `/public/about` | Public | Taps "About" in navigation drawer | Returns to home |
+| **SCR-08** | Login Screen | `/auth/login` | Public | Role selected in SCR-02 | Valid credentials verified |
+| **SCR-09** | Forgot Password Modal | `/auth/forgot_password` | Public | Taps "Forgot Password?" in SCR-08 | OTP verified or dialog dismissed |
+| **SCR-10** | Force Password Change | `/auth/force_password_change` | Authenticated (Temp Password) | `is_temp_password == true` | New strong password committed |
+| **SCR-11** | Student Dashboard | `/student/dashboard` | Student | Active session, role = `STUDENT` | Selects feature or logs out |
+| **SCR-12** | Learning Materials Hub | `/student/materials` | Student | Taps "Study Material" tile | Opens document or returns |
+| **SCR-13** | Student Tasks Screen | `/student/tasks` | Student | Taps "My Tasks" tile or tab bar | Selects task for submission |
+| **SCR-14** | Submit Work Screen | `/student/tasks/submit` | Student, Team | Selects active task to upload | File uploaded to Drive or canceled |
+| **SCR-15** | Student Competitions | `/student/competitions` | Student, Team | Taps "Competitions" from dashboard | Views rules or returns |
+| **SCR-16** | Student AI Quiz Screen | `/student/quiz` | Student | Taps "AI Quiz" tile (quiz is LIVE) | Completes quiz or timer reaches 0 |
+| **SCR-17** | Student Attendance Log | `/student/attendance` | Student | Taps "Attendance" tile | Views history and returns |
+| **SCR-18** | Student Profile Screen | `/student/profile` | Student | Taps "Profile" tab | Logs out or edits preferences |
+| **SCR-19** | Team Dashboard | `/team/dashboard` | Team | Active session, role = `TEAM` | Selects squad action or logs out |
+| **SCR-20** | Team Tasks Screen | `/team/tasks` | Team | Taps "Team Tasks" tile | Selects squad task or returns |
+| **SCR-21** | Member Credits Modal | `/team/member_credits` | Team | Taps "Member Contribution" | Updates credits or dismisses |
+| **SCR-22** | Teacher Dashboard | `/teacher/dashboard` | Teacher, Admin | Active session, role = `TEACHER`/`ADMIN` | Selects operation or logs out |
+| **SCR-23** | Mark Attendance Screen | `/teacher/attendance` | Teacher, Admin | Taps "Mark Batch Attendance" | Saves attendance sync or cancels |
+| **SCR-24** | Daily Review Screen | `/teacher/daily_review` | Teacher, Admin | Taps "Daily Company Review" | Submits 8 fields or cancels |
+| **SCR-25** | Teacher AI Quiz Generator | `/teacher/ai_quiz` | Teacher, Admin | Taps "AI Quiz Generator" | Approves/schedules or cancels |
+| **SCR-26** | Submissions Review Queue | `/teacher/submissions/review` | Teacher, Admin | Taps "Submissions Queue" | Commits dual marks or cancels |
+| **SCR-27** | Admin Dashboard | `/admin/dashboard` | Admin | Active session, role = `ADMIN` | Selects admin tool or logs out |
+| **SCR-28** | Register Student Screen | `/admin/students/register` | Admin, Teacher | Taps "Register Student" | WhatsApp invite launched |
+| **SCR-29** | Course Management Screen | `/admin/courses/manage` | Admin | Taps "Manage Courses" | Edits course or returns |
+| **SCR-30** | Chat & Moderation Screen | `/chat/room` | Student, Teacher, Admin | Taps "Chat" tab or channel item | Leaves channel or reports message |
+
+---
+
+## 2. Global Role-Based Navigation Flows (Mermaid Diagrams)
+
+### Flow 1: Public Visitor Flow
+Unauthenticated users can explore promotional and academic content without barriers, credentials, or certificate monetization prompts.
 
 ```mermaid
 flowchart TD
-    Splash["1. App Launch / Splash Screen (Drone Theme)"] --> RoleSelect["2. Role Selection (Student / Teacher / Team / Admin)"]
-    RoleSelect -->|Visitor / Browse| PublicHome["3. Public Home Screen (No Login Required)"]
-    RoleSelect -->|Student| StudentLogin["4. Student Login (Mobile + Password)"]
-    RoleSelect -->|Teacher| TeacherLogin["5. Teacher Login (Mobile + Password)"]
-    RoleSelect -->|Admin| AdminLogin["6. Admin Login (Username/Mobile + Password)"]
-    RoleSelect -->|Team Squad| TeamLogin["7. Team Login (Team ID + Password)"]
-
-    PublicHome --> PublicCourses["Course Catalog"]
-    PublicHome --> PublicGallery["Approved Work Gallery"]
-    PublicHome --> PublicLeaderboard["Top Teams & Top Students"]
-    PublicHome --> PublicAbout["About Skill Center"]
-
-    StudentLogin -->|First Login / Temp Password| ForcePassChange["Change Temp Password Screen"]
-    StudentLogin -->|Authenticated| StudentDash["Student Dashboard"]
+    Launch([App Launch]) --> Splash[SCR-01: Splash Screen<br/>Quadcopter Hover Animation]
+    Splash --> RoleSel[SCR-02: Role Selection Screen]
     
-    TeacherLogin -->|Authenticated| TeacherDash["Teacher Dashboard"]
-    AdminLogin -->|Authenticated| AdminDash["Admin Dashboard"]
-    TeamLogin -->|Authenticated| TeamDash["Team Portal Dashboard"]
-
-    subgraph Student Journey
-        StudentDash --> LearningHub["Learning Materials (PDF, Video, DOCX)"]
-        StudentDash --> TasksList["Assigned Tasks (Individual & Team)"]
-        TasksList --> SubmitWork["Submit Work (Upload MP4/Photos/Docs)"]
-        StudentDash --> QuizHub["Bi-Weekly AI Quizzes"]
-        QuizHub --> TakeQuiz["Take Timed Quiz -> Auto Results"]
-        StudentDash --> AttendanceHistory["Personal Attendance History"]
-        StudentDash --> ChatHub["Student Chat (P2P, Team, Batch)"]
-        StudentDash --> StudentProfile["Profile & Overall Ranking"]
-    end
-
-    subgraph Teacher Journey
-        TeacherDash --> BatchMgmt["Batch & Student Roster"]
-        TeacherDash --> TeamMgmt["Team Creation & Student Assignment"]
-        TeacherDash --> TaskCreation["Task & Competition Authoring"]
-        TeacherDash --> ReviewQueue["Review Submissions & Marks Awarding"]
-        TeacherDash --> MarkAttendance["Mark Batch Attendance (Sync Sheet)"]
-        TeacherDash --> DailyReviewForm["Submit Daily Company Review"]
-        TeacherDash --> AIQuizGen["AI Quiz Generator & Approvals"]
-        TeacherDash --> Reports["Batch Analytics & Progress Reports"]
-    end
-
-    subgraph Admin Journey
-        AdminDash --> CourseMgmt["Create & Manage Skill Courses"]
-        AdminDash --> TeacherMgmt["Add Teachers & Assign Scopes"]
-        AdminDash --> StudentReg["Register Student + WhatsApp Onboard"]
-        AdminDash --> NoticeMgmt["Publish General & Task Notices"]
-        AdminDash --> GalleryModeration["Curate Public Gallery"]
-        AdminDash --> AuditLogs["Activity Logs & Security"]
-    end
-
-    subgraph Team Journey
-        TeamDash --> TeamTasks["View Squad Assignments"]
-        TeamDash --> TeamSubmit["Upload Group Work + Member Credits"]
-        TeamDash --> TeamScores["View Pure Team Marks & Rank"]
-    end
+    RoleSel -->|Tap 'Public Feed'| Home[SCR-03: Public Home Screen]
+    RoleSel -->|Select Role & Tap Login| Login[SCR-08: Login Screen]
+    
+    Home -->|Tap Drawer Menu| Drawer[Navigation Drawer]
+    Drawer --> Home
+    Drawer --> Courses[SCR-04: Course Catalog Screen]
+    Drawer --> Gallery[SCR-05: Public Showcase Gallery]
+    Drawer --> Leaderboard[SCR-06: Leaderboard Screen]
+    Drawer --> About[SCR-07: About & Policy Screen]
+    Drawer --> Login
+    
+    Home -->|Tap Top Team Card| Leaderboard
+    Home -->|Tap Top 5 Students| Leaderboard
+    Home -->|Tap Notice Bar| NoticeModal[Notice Details Dialog]
+    Home -->|Tap Showcase Reel| FullscreenReel[Fullscreen Reel Video Player]
+    Home -->|Tap Course Tile| Courses
+    
+    NoticeModal --> Home
+    FullscreenReel --> Home
 ```
 
 ---
 
-### Detailed Journey Specifications
+### Flow 2: Student User Flow
+Encompasses authentication, mandatory first-login password updates, personalized learning, wavy slider video submissions, timed quizzes, and peer chat.
 
-#### Journey 1: Visitor & Public Experience
-1. **Entry**: Any user can launch the app and tap "Explore Public Content" from the role selection screen or bottom navigation.
-2. **Public Home Feed**:
-   - Drone cinematic header banner with tagline *"Learn > Practice > Create > Compete > Share > Grow"*.
-   - **Important Notice Ticker**: Flashing general announcements (e.g. *"Next Competition: Cinematic Drone Short Film - 18 Nov 2026"*).
-   - **Top Team of the Week**: Spotlights Team *Veervaan* with member photos, team score (e.g. `485 / 500`), and performance percentage (`97.0%`).
-   - **Top 5 Students**: Cards showing student photo, name, course, rank, and score.
-   - **Student Work Gallery**: Filterable stream of approved drone clips and photo reels with full-screen playback.
-   - **Course Directory**: Syllabus and outcomes for Drone Film Making, Mobile Repairing, Front Office, etc.
-
-#### Journey 2: Student Registration & WhatsApp Onboarding
-1. **Action by Teacher / Admin**:
-   - Opens "Register Student" screen.
-   - Enters: Full Name, 10-digit Mobile Number, Email Address, Course (e.g. `CRS_DRONE`), Batch (`BTC_DFM_01`), and optional initial Team assignment (`TM_VEERVAAN`).
-2. **Backend Processing**:
-   - Generates unique Student ID (`STU_DFM_042`).
-   - Generates random secure temporary password (e.g. `Dfm#Rohan78`).
-   - Stores salted SHA-256 hash in `Users` sheet with `is_temp_password = TRUE`.
-   - Pre-populates a formatted WhatsApp invitation text.
-3. **Onboarding Hand-off**:
-   - Administrator taps **"Send via WhatsApp"** button.
-   - The device opens the official WhatsApp chat pre-filled with:
-     > *"Namaste [Student Name]! Welcome to DFM Korba Skill Center. Your Student ID: [ID] | Login: [Mobile] | Temp Password: [TempPass]. Please install the app and log in."*
-   - Admin also has a **"Copy Credentials"** button for clipboard backup.
-
-#### Journey 3: Student First Login & Forced Password Change
-1. **Login**: Student enters registered Mobile Number and temporary password.
-2. **State Interceptor**: Backend verifies credentials and detects `is_temp_password == TRUE`.
-3. **Redirection**: Student is immediately routed to `ForcePasswordChangeScreen`.
-4. **Validation Rules**:
-   - Minimum 8 characters.
-   - At least 1 uppercase letter, 1 number, and 1 special character.
-   - Cannot match the temporary password.
-5. **Confirmation**: On success, `is_temp_password` is set to `FALSE`, a new session token is issued, and student enters their personal dashboard.
-
-#### Journey 4: Task Execution & Work Submission (Wavy Slider Animation)
-1. **Discovery**: Student opens `Tasks` tab; views cards grouped by *Today's Task*, *Pending*, and *Submitted*.
-2. **Open Task**: Taps on *"Drone Cinematic Sunset Shoot - Due: 12 Nov | 100 Marks"*.
-3. **Brief & Rubric**: Reads flight safety guidelines, shot checklist (Orbit, Reveal, Fly-over), and allowed formats (`MP4`, `MOV`, max `500 MB`).
-4. **Upload Trigger**: Taps the Neumorphic Cloud Upload container.
-5. **File Selection**: Uses native file picker to select `drone_shoot.mp4` (e.g. 324 MB).
-6. **Wavy Track Animation**: An animated sinusoidal soundwave/progress track simulates compression check and active upload state.
-7. **Member Contribution Notes**: Student writes notes: *"Aman: Pilot in Command; Rahul: Camera Gimbal Operator; Priya: Post-production Color Grading"*.
-8. **Submission Confirmation**: Taps orange CTA **"Submit Task ->"** with arrow launch micro-interaction. Status transitions to `Pending Review`.
-
-#### Journey 5: Teacher Evaluation & Dual Marks Recording
-1. **Teacher Alert**: Instructor sees a notification badge on "Submissions Review Queue".
-2. **Playback & Review**: Opens the submission, streams the video directly or opens in full screen.
-3. **Evaluation Modal**:
-   - **Award Team Score**: Sets collective team points (e.g. `95 / 100`) recorded into `TeamMarks` table.
-   - **Award Individual Scores**: Enters specific marks for each contributing student recorded into `IndividualMarks` table.
-   - **Feedback**: Enters constructive notes (*"Smooth gimbal pitch on the sunset reveal; watch propeller shadows in frame"*).
-   - **Gallery Toggle**: Switches ON *"Publish to Public Showcase Gallery"*.
-4. **Commitment**: The record updates atomically in Google Sheets; student receives an instant in-app notification.
-
-#### Journey 6: Daily Attendance & Company Review Synchronization
-1. **Attendance Marking**:
-   - Teacher selects Date and Batch.
-   - App renders the student roster pulling verified Student IDs from the Google Sheet.
-   - Quick toggles: "Mark All Present", followed by single taps to mark specific students "Absent".
-   - Taps "Save Attendance": Writes records directly to the project owner's attendance sheet structure.
-2. **Daily Company Review**:
-   - At end-of-day, teacher fills out the standard 8-field review form:
-     1. Date
-     2. Course & Batch
-     3. Activities completed (theory + simulator + flight time)
-     4. Student progress observations
-     5. Challenges encountered (battery degradation, weather constraints)
-     6. Output deliverables completed
-     7. Teacher remarks & signature
-   - Submits directly into the designated `DailyReviews` Google Sheet.
-
-#### Journey 7: AI Quiz Generation & Fortnightly Exam Lifecycle
-1. **Teacher Trigger**: Every 15 days, teacher opens "AI Quiz Generator".
-2. **Configuration**: Selects Course (`Drone Film Making`), Topic (`Indian Airspace Categories & DGCA Drone Rules`), Question count (`15`), Difficulty (`Intermediate`).
-3. **Server-Side Generation**: Backend connects to Gemini API with curriculum context.
-4. **Review & Edit**: Teacher reviews the generated MCQs, True/False items, and answer keys; edits wording or swaps questions.
-5. **Scheduling**: Teacher sets availability window (e.g. Friday 9:00 AM – 9:00 PM, 20-minute timer).
-6. **Student Quiz Experience**:
-   - Student enters quiz; 20-minute countdown starts.
-   - Neumorphic radio cards for options A, B, C, D.
-   - On completion or timer expiry, answers auto-submit.
-   - Auto-graded objective score is displayed immediately with correct answers and explanations.
+```mermaid
+flowchart TD
+    Login[SCR-08: Student Login Screen] --> AuthCheck{Credentials Valid?}
+    AuthCheck -->|No: Counter < 3| LoginError[Show Attempt Warning]
+    LoginError --> Login
+    AuthCheck -->|No: Counter >= 3| Lockout[30-Minute Lockout Error SCR-08]
+    AuthCheck -->|Yes: is_temp_password = true| ForcePass[SCR-10: Force Password Change]
+    AuthCheck -->|Yes: is_temp_password = false| StudentDash[SCR-11: Student Dashboard]
+    
+    ForcePass -->|Commit Strong Password| StudentDash
+    
+    StudentDash -->|Tab: Learning / Tile| LearnHub[SCR-12: Learning Materials Hub]
+    StudentDash -->|Tab: Tasks / Today's Task| Tasks[SCR-13: Student Tasks Screen]
+    StudentDash -->|Tile: AI Quiz| Quiz[SCR-16: Student AI Quiz Screen]
+    StudentDash -->|Tile: Attendance| AttLog[SCR-17: Attendance History]
+    StudentDash -->|Tile: Competitions| Comps[SCR-15: Student Competitions Screen]
+    StudentDash -->|Tab: Chat| Chat[SCR-30: Scoped Chat Channels]
+    StudentDash -->|Tab: Profile| Profile[SCR-18: Student Profile Modal]
+    
+    Tasks -->|Select Active Task| SubmitWork[SCR-14: Submit Work Screen<br/>Wavy Slider Upload]
+    SubmitWork -->|Upload File + Notes| UploadSuccess[Upload Success Modal]
+    UploadSuccess --> Tasks
+    
+    Quiz -->|15-Min Timer Running| QuizQuestions[Answer MCQs / True-False]
+    QuizQuestions -->|Submit or Timer Expiry| QuizResult[Auto-Graded Result Card]
+    QuizResult --> StudentDash
+    
+    Profile -->|Tap Logout| LogoutConfirm{Confirm Logout?}
+    LogoutConfirm -->|Yes| RoleSel[SCR-02: Role Selection]
+    LogoutConfirm -->|No| StudentDash
+```
 
 ---
-*End of Application Flow Documentation.*
 
+### Flow 3: Team Squad User Flow
+Dedicated squad portal access using unique Team ID, ensuring separation from private individual student accounts.
+
+```mermaid
+flowchart TD
+    TeamLogin[SCR-08: Team Login Screen<br/>Input: Team ID & Password] --> TeamAuthCheck{Valid Team Credentials?}
+    TeamAuthCheck -->|No| TeamError[Show Error Dialog]
+    TeamError --> TeamLogin
+    TeamAuthCheck -->|Yes| TeamDash[SCR-19: Team Portal Dashboard<br/>#1 Trophy Badge & 485 Pts]
+    
+    TeamDash -->|Tap 'Team Tasks'| TeamTasks[SCR-20: Team Tasks Screen]
+    TeamDash -->|Tap 'Member Contribution'| Credits[SCR-21: Member Credits Modal]
+    TeamDash -->|Tap 'Team Submissions'| TeamSubmit[SCR-14: Submit Work Screen]
+    TeamDash -->|Tap 'Score & Ranking'| Standings[SCR-06: Leaderboard Standings]
+    TeamDash -->|Tap Logout| RoleSel[SCR-02: Role Selection Screen]
+    
+    TeamTasks --> TeamSubmit
+    TeamSubmit -->|Upload Group Reel + Member Notes| UploadDone[Submission Pending Review]
+    UploadDone --> TeamDash
+    
+    Credits -->|View / Update Crew Roles| TeamDash
+```
+
+---
+
+### Flow 4: Faculty Instructor (Teacher) User Flow
+Operational command center for marking attendance, submitting daily company reviews, generating AI quizzes, and dual marks grading.
+
+```mermaid
+flowchart TD
+    TeacherLogin[SCR-08: Teacher Login Screen] --> TeacherDash[SCR-22: Teacher Dashboard<br/>4 Batches • 68 Students • 12 Tasks]
+    
+    TeacherDash -->|Operation 1| MarkAtt[SCR-23: Mark Attendance Screen]
+    TeacherDash -->|Operation 2| DailyRev[SCR-24: Daily Company Review Form]
+    TeacherDash -->|Operation 3| AIQuiz[SCR-25: Teacher AI Quiz Generator]
+    TeacherDash -->|Operation 4| SubReview[SCR-26: Submissions Review Queue]
+    TeacherDash -->|Operation 5| RegStudent[SCR-28: Register Student Screen]
+    TeacherDash -->|Operation 6| ChatMod[SCR-30: Chat & Moderation Screen]
+    TeacherDash -->|Tap Logout| RoleSel[SCR-02: Role Selection Screen]
+    
+    MarkAtt -->|Tap 'All Present' / Toggle| SaveAtt[Sync Attendance to Google Sheet]
+    SaveAtt --> TeacherDash
+    
+    DailyRev -->|Fill 8 Mandatory Fields| SubmitReview[Submit Daily Operational Log]
+    SubmitReview --> TeacherDash
+    
+    AIQuiz -->|Input Topic & Count| GeminiCall[Generate Drafts via Gemini AI]
+    GeminiCall --> ReviewDrafts[Review & Edit Question Bank]
+    ReviewDrafts -->|Approve & Schedule| ScheduleLive[Publish Quiz to Batch]
+    ScheduleLive --> TeacherDash
+    
+    SubReview -->|Select Submission| PlayVideo[Inspect Video / Photos]
+    PlayVideo --> DualMarks[Award Atomic Team Marks + Ind. Crew Marks]
+    DualMarks --> GalleryToggle{Publish to Public Gallery?}
+    GalleryToggle -->|Yes: publish_to_gallery = true| CommitReview[Commit to Sheets Database]
+    GalleryToggle -->|No: publish_to_gallery = false| CommitReview
+    CommitReview --> TeacherDash
+```
+
+---
+
+### Flow 5: System Administrator User Flow
+Global administration of multi-course catalogs, faculty scope assignments, student enrollment with WhatsApp hand-offs, and security audit logs.
+
+```mermaid
+flowchart TD
+    AdminLogin[SCR-08: Admin Login Screen] --> AdminDash[SCR-27: Admin Dashboard<br/>8 Courses • 12 Teachers • 248 Students]
+    
+    AdminDash -->|Tool 1| RegStudent[SCR-28: Register Student Screen]
+    AdminDash -->|Tool 2| CourseMgmt[SCR-29: Course Management Screen]
+    AdminDash -->|Tool 3| NoticeAuthor[Notice Authoring Screen]
+    AdminDash -->|Tool 4| ChatAudit[SCR-30: Chat Moderation Screen]
+    AdminDash -->|Tool 5| SecurityLogs[Activity & Security Logs Screen]
+    AdminDash -->|Tap Logout| RoleSel[SCR-02: Role Selection Screen]
+    
+    RegStudent -->|Enter Student Info| GenCreds[Generate Student ID & Temp Pass]
+    GenCreds --> WhatsAppModal[Pre-Filled WhatsApp Invitation Card]
+    WhatsAppModal -->|Tap 'Send via WhatsApp'| LaunchWA[External WhatsApp App Launched]
+    WhatsAppModal -->|Tap 'Copy Credentials'| CopyClip[Credentials Copied to Clipboard]
+    LaunchWA --> AdminDash
+    CopyClip --> AdminDash
+    
+    CourseMgmt -->|Add New Course| SaveCourse[Save New Course to Courses Sheet]
+    SaveCourse --> AdminDash
+    
+    ChatAudit -->|Inspect Flagged Messages| ModAction{Take Action?}
+    ModAction -->|Mute User| CommitMod[Write to ActivityLogs]
+    ModAction -->|Delete Message| CommitMod
+    CommitMod --> AdminDash
+```
+
+---
+
+## 3. Detailed Screen Specifications & State Models
+
+### SCR-01: Splash Screen
+- **Entry Conditions**: Application process start.
+- **Exit Conditions**: Bootstrap verification completes ($\le 2.2\text{s}$). If active session token exists, auto-routes to respective dashboard; otherwise routes to SCR-02.
+- **Permissions**: Public.
+- **UI State Models**:
+  - *Loading State*: Quadcopter drone silhouette hovers vertically with 4 counter-rotating rotor discs and pulsating sonar rings (`DroneLoadingIndicator`).
+  - *Error State*: If local storage fails to initialize, displays *"Storage initialization error. Please restart application."* with retry CTA.
+  - *Success State*: Seamless shared axis fade-out into target screen.
+
+### SCR-02: Role Selection Screen
+- **Entry Conditions**: Routed from SCR-01 (unauthenticated) or when user taps "Logout".
+- **Exit Conditions**: User selects a role card and taps "Login as [ROLE] ->", or taps "Public Feed".
+- **Permissions**: Public.
+- **UI State Models**:
+  - *Default State*: 2x2 Neumorphic grid with 4 role cards: Student, Teacher, Team, Admin. Language switcher chip in top-left (English / हिंदी).
+  - *Selection State*: Tapped role card illuminates with high-contrast accent border (Student: Teal, Teacher: Purple, Team: Gold, Admin: Cyan).
+  - *Empty / Error State*: N/A.
+
+### SCR-03: Public Home Screen
+- **Entry Conditions**: Visitor taps "Public Feed" from SCR-02 or bottom navigation.
+- **Exit Conditions**: Visitor taps drawer menu, course tile, showcase video, or top "Login" CTA.
+- **Permissions**: Public (No authentication required).
+- **UI State Models**:
+  - *Loading State*: Subtle skeleton placeholders for notices, top team banner, and student cards.
+  - *Empty State*: If no notices exist, displays *"No urgent announcements at this time."* If gallery is empty, displays *"Student showcase gallery updating."*
+  - *Success State*: Renders Hero Banner, Important Notice Ticker, Top Team Card (Team Veervaan with member avatars, score 485/500, 97.0%), Top 5 Students Leaderboard, and Student Work Gallery.
+  - *Error State*: On offline network failure, renders cached local data with a subtle offline banner: *"Viewing offline cached showcase."*
+
+### SCR-08: Login Screen
+- **Entry Conditions**: Role selected from SCR-02.
+- **Exit Conditions**: Valid session token issued; user routes to dashboard (or SCR-10 if temporary password).
+- **Permissions**: Public.
+- **UI State Models**:
+  - *Input State*: Inset tactile text fields for Mobile Number / Team ID and Password with visibility toggle.
+  - *Loading State*: `NeuButton` shrinks into circular process spinner while calling backend `LOGIN` action.
+  - *Error State (Invalid Password)*: Alert dialog displaying remaining attempts (e.g. *"Invalid credentials. 2 attempts remaining."*).
+  - *Error State (Lockout)*: Red banner displaying *"Account locked due to 3 consecutive failed attempts. Try again in 30 minutes or reset password."*
+  - *Success State*: Session saved in `SharedPreferences`, user routed to dashboard.
+
+### SCR-09: Forgot Password Modal (OTP Reset)
+- **Entry Conditions**: User taps "Forgot Password?" in SCR-08.
+- **Exit Conditions**: 6-digit OTP verified and new password saved, or modal dismissed.
+- **Permissions**: Public.
+- **UI State Models**:
+  - *Input State*: Mobile number and registered email address fields.
+  - *OTP Verification State*: 6-digit numeric input with countdown timer (10 minutes validity).
+  - *Error State*: *"Invalid or expired OTP. Maximum 5 attempts per 24 hours allowed."*
+  - *Success State*: *"Password reset successfully. Please log in with your new password."*
+
+### SCR-10: Force Password Change Screen
+- **Entry Conditions**: Authenticated user session where `is_temp_password == true`.
+- **Exit Conditions**: Successful commitment of new strong password.
+- **Permissions**: Authenticated (Temporary Hold). Direct access to any other screen is blocked.
+- **UI State Models**:
+  - *Input State*: Current temporary password, new password, confirm new password fields.
+  - *Validation State*: Real-time checklist validating $\ge 8$ chars, uppercase letter, number, special character.
+  - *Error State*: *"New password cannot match temporary password"* or *"Passwords do not match."*
+  - *Success State*: Updates `Users` table (`is_temp_password = false`), displays success snackbar, and redirects to dashboard.
+
+### SCR-11: Student Dashboard Screen
+- **Entry Conditions**: Valid student session (`role == 'STUDENT'`).
+- **Exit Conditions**: Navigates to feature screens or logs out.
+- **Permissions**: Student Only.
+- **UI State Models**:
+  - *Loading State*: Telemetry loading placeholders.
+  - *Success State*:
+    - Header: *"Hello, Aman - Student • DFM Batch 01"*, drone icon.
+    - My Progress Card: 92% performance bar, cumulative marks (490 pts), attendance (98.5%), rank #1.
+    - 2x3 Grid: My Course, My Tasks (with badge '3'), Study Material, AI Quiz, My Team, Attendance.
+    - Today's Task Spotlight: *"Drone Cinematic Shoot, Due: 12 Nov | 100 Marks"* with "Submit" button.
+    - Bottom Nav: Floating Bubble Nav (Dashboard, Learning, Tasks, Chat, Profile).
+  - *Error State*: Retry banner on network timeout; displays cached dashboard metrics.
+
+### SCR-14: Submit Work Screen (Wavy Slider Upload)
+- **Entry Conditions**: Student or Squad Leader opens assigned task to upload work.
+- **Exit Conditions**: File uploaded to Drive and recorded in `Submissions`, or user taps Back.
+- **Permissions**: Enrolled Student or Squad Team.
+- **UI State Models**:
+  - *Picker State*: Cloud upload icon, allowed formats (`MP4`, `MOV`, `JPG`, `PDF`), max size 500 MB.
+  - *Selected State*: File pill display (`drone_shoot.mp4 324 MB • Ready`) with remove icon.
+  - *Uploading State*: `WavyTrackSlider` oscillates with sinusoidal waves; percentage indicator updates from 0% to 100%.
+  - *Contribution Notes State*: Multi-line text field capturing individual member role contributions.
+  - *Success State*: Full-screen confirmation dialog with checkmark icon: *"Work Submitted! Status: Pending Review."*
+  - *Error State*: *"File exceeds 500 MB limit"* or *"Upload connection lost. Retrying in 5 seconds."*
+
+### SCR-16: Student AI Quiz Screen
+- **Entry Conditions**: Student opens scheduled fortnightly quiz (`status == 'LIVE'`).
+- **Exit Conditions**: Student submits answers or 15-minute countdown clock expires.
+- **Permissions**: Enrolled Student in target batch.
+- **UI State Models**:
+  - *Timer Active State*: Synchronized countdown clock (`14:59`, `14:58`...) in top app bar.
+  - *Question State*: Question card with Neumorphic radio cards for options A, B, C, D. Next/Previous buttons.
+  - *Auto-Submit State*: When timer reaches `00:00`, interface disables further selections and auto-submits.
+  - *Result State*: Trophy icon, score card (e.g. *"You scored 8 / 10 (80%)"*), correct answer keys, and pedagogical explanations.
+
+### SCR-22: Teacher Dashboard Screen
+- **Entry Conditions**: Valid teacher session (`role == 'TEACHER'` or `'ADMIN'`).
+- **Exit Conditions**: Navigates to faculty operational tools or logs out.
+- **Permissions**: Faculty Instructor / Administrator.
+- **UI State Models**:
+  - *Metrics Grid*: 4 Batches, 68 Students, 12 Tasks, 6 Competitions.
+  - *Operations List*:
+    1. Mark Batch Attendance
+    2. Daily Company Review
+    3. AI Quiz Generator (Gemini)
+    4. Submissions Review Queue
+  - *Empty State*: If no submissions pending review, displays *"Review queue clear. All student work graded."*
+
+### SCR-23: Mark Batch Attendance Screen
+- **Entry Conditions**: Teacher opens attendance from SCR-22.
+- **Exit Conditions**: Attendance records saved and synced to Google Sheet, or teacher taps Back.
+- **Permissions**: Assigned Teacher or Administrator.
+- **UI State Models**:
+  - *Roster State*: Student list matched to unique Student IDs (`STU_DFM_001`, `STU_DFM_002`...).
+  - *Toggle State*: Tapping "All Present" turns all cards green (`PRESENT`). Tapping an individual student card toggles to red (`ABSENT`).
+  - *Saving State*: `NeuButton` displays process spinner while invoking `SAVE_ATTENDANCE`.
+  - *Success State*: Snackbar confirming *"Attendance synchronized with Google Sheet for X students."*
+
+### SCR-24: Daily Company Review Form Screen
+- **Entry Conditions**: Teacher opens daily review from SCR-22.
+- **Exit Conditions**: 8-field report committed to `DailyReviews` sheet.
+- **Permissions**: Faculty Instructor or Administrator.
+- **UI State Models**:
+  - *Form State*: 8 project owner fields (Date, Course, Batch, Instructor, Activities Completed, Student Progress, Challenges Faced, Work Completed, Overall Remarks).
+  - *Validation State*: Enforces non-empty content in all 8 fields.
+  - *Success State*: Confirms *"Daily Company Review submitted successfully."*
+
+### SCR-25: Teacher AI Quiz Generator Screen
+- **Entry Conditions**: Teacher opens AI quiz tool from SCR-22.
+- **Exit Conditions**: Quiz approved and scheduled, or canceled.
+- **Permissions**: Faculty Instructor or Administrator.
+- **UI State Models**:
+  - *Configuration State*: Topic text field, question count dropdown (5, 10, 15), difficulty selector (Beginner, Intermediate, Advanced).
+  - *AI Generating State*: Process animation while Apps Script calls Gemini 1.5 API.
+  - *Review & Approval State*: Renders generated MCQs with options, correct answer keys, and explanations. Teacher can edit text or swap questions.
+  - *Schedule State*: Sets 15-day availability window, pass marks, and commits `APPROVE_AND_SCHEDULE_QUIZ`.
+
+### SCR-26: Submissions Review Queue (Dual Marks Engine)
+- **Entry Conditions**: Teacher opens review queue from SCR-22.
+- **Exit Conditions**: Marks committed to `TeamMarks` and `IndividualMarks` sheets.
+- **Permissions**: Faculty Instructor or Administrator.
+- **UI State Models**:
+  - *Video Inspection State*: Video player thumbnail with stream link (`drone_shoot.mp4 324 MB`).
+  - *Decision State*: Choice chips (`APPROVED`, `REJECTED`, `RESUBMISSION_REQ`).
+  - *Dual Marks Entry State*:
+    - Squad Score: Atomic score entry (e.g. `95 / 100`) recorded to `TeamMarks` (never multiplied by member count).
+    - Individual Crew Breakdown: Specific marks per member (Aman: 95 [Pilot], Rahul: 92 [Gimbal], Priya: 96 [Colorist]) recorded to `IndividualMarks`.
+  - *Gallery Toggle*: Switch for `publish_to_gallery`.
+  - *Success State*: *"Submission evaluated! Dual marks recorded."*
+
+### SCR-27: Admin Dashboard Screen
+- **Entry Conditions**: Valid administrator session (`role == 'ADMIN'`).
+- **Exit Conditions**: Navigates to administrative tools or logs out.
+- **Permissions**: System Administrator Only.
+- **UI State Models**:
+  - *Metrics Grid*: 8 Courses, 12 Teachers, 248 Students, 28 Teams.
+  - *Tools List*: Register Student & WhatsApp Onboard, Manage Courses, Publish System Notices, Security & Activity Logs.
+
+### SCR-28: Register Student Screen (WhatsApp Onboarding)
+- **Entry Conditions**: Admin or Teacher opens student registration.
+- **Exit Conditions**: Student saved, credentials generated, WhatsApp invite launched.
+- **Permissions**: Administrator or Teacher.
+- **UI State Models**:
+  - *Input Form State*: Full name, 10-digit mobile number, email, course dropdown, batch dropdown.
+  - *Processing State*: Backend generates Student ID (`STU_DFM_xxx`), temporary password (`Dfm#...`), and pre-formatted invitation message.
+  - *Onboarding Hand-off State*:
+    - Displays Student ID, Full Name, Mobile, and Temp Password card.
+    - Pre-filled WhatsApp message card.
+    - Green Button: *"Send Invitation via WhatsApp  📱"* (launches WhatsApp with pre-filled text).
+    - Dark Button: *"Copy Credentials to Clipboard  📋"*.
+    - Link: *"Register Another Student"*.
+
+### SCR-30: Chat & Moderation Screen
+- **Entry Conditions**: User taps "Chat" tab from dashboard.
+- **Exit Conditions**: User returns to dashboard or exits room.
+- **Permissions**: Student, Teacher, Admin (scoped by channel membership).
+- **UI State Models**:
+  - *Channel Selector State*: Horizontal chips for Team Veervaan Squad, DFM Batch 01 Main, and P2P peer channels.
+  - *Stream State*: Timeline showing incoming/outgoing bubbles with timestamps and sender role tags.
+  - *Input State*: Text box with arrow send button (`ArrowLaunchButton`).
+  - *Report Modal State*: Tapping flag icon opens report dialog with reason options (Inappropriate language, spam, harassment).
+  - *Moderation State (Admin/Teacher)*: Option to mute bad actors or delete flagged messages.
+
+---
+
+## 4. Navigation Guards & Route Access Enforcement
+
+The mobile client implements declarative route guards in Dart to ensure that unauthorized users cannot reach protected screens through direct navigation or state spoofing:
+
+```dart
+// Core Route Protection Guard Concept
+Widget guardRoute({
+  required BuildContext context,
+  required Widget destination,
+  required List<String> allowedRoles,
+}) {
+  final auth = context.read<AuthProvider>();
+
+  // 1. Unauthenticated check
+  if (!auth.isAuthenticated) {
+    return const RoleSelectionScreen();
+  }
+
+  // 2. Forced Temporary Password Change check
+  if (auth.isTempPassword && destination.runtimeType != ForcePasswordChangeScreen) {
+    return const ForcePasswordChangeScreen();
+  }
+
+  // 3. Role-Based Access Control check
+  if (!allowedRoles.contains(auth.userRole)) {
+    return const RoleSelectionScreen();
+  }
+
+  return destination;
+}
+```
+
+---
+*End of Application Flow & Navigation Architecture (APP_FLOW.md).*
