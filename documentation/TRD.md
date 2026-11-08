@@ -137,3 +137,4 @@ DFM_KORBA_APP_ROOT/
 - **Android**: Android 5.0 (API Level 21) up to Android 14+ (API Level 34). Compiled as 64-bit APK (`armeabi-v7a`, `arm64-v8a`, `x86_64`).
 - **iOS**: iOS 13.0 through iOS 17+. Configured for standard Apple Developer signing and distribution via TestFlight and the App Store.
 - **Hardware Acceleration**: Skia / Impeller rendering enabled for fluid 60fps animations.
+

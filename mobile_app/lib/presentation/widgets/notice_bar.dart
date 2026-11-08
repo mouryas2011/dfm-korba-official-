@@ -110,3 +110,4 @@ class NoticeBar extends StatelessWidget {
     );
   }
 }
+

@@ -297,3 +297,4 @@ var ReportingService = (function() {
     getAdminDashboard: getAdminDashboard
   };
 })();
+

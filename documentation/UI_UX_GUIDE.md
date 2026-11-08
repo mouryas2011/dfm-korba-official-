@@ -101,3 +101,4 @@ Key aesthetic characteristics:
 ### 4. Accessibility & Motion Controls
 - **Reduced Motion Setting**: All custom animation controllers query `MediaQuery.of(context).disableAnimations`. If reduced motion is requested by the OS or user preference, animation durations collapse to 0ms with instant state transitions.
 - **Haptic Feedback**: Subtle tactile clicks on button presses (`HapticFeedback.lightImpact()`) and error vibrations (`HapticFeedback.heavyImpact()`).
+

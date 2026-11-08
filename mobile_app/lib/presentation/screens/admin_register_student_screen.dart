@@ -287,3 +287,4 @@ class _AdminRegisterStudentScreenState extends State<AdminRegisterStudentScreen>
     );
   }
 }
+

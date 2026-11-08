@@ -28,3 +28,4 @@ class SmoothPageRoute<T> extends PageRouteBuilder<T> {
           },
         );
 }
+

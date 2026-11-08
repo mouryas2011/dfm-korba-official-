@@ -54,3 +54,4 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 }
+

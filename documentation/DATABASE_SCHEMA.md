@@ -489,3 +489,4 @@ System-wide configuration, AI prompts, and public toggles.
 
 ---
 *End of Database Schema Specification.*
+

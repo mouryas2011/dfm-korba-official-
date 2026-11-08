@@ -148,3 +148,4 @@ class _DronePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _DronePainter oldDelegate) => true;
 }
+

@@ -391,3 +391,4 @@ var AuthService = (function() {
     registerStudent: registerStudent
   };
 })();
+

@@ -141,3 +141,4 @@ class AppLocalizationsDelegate
   @override
   bool shouldReload(AppLocalizationsDelegate old) => false;
 }
+

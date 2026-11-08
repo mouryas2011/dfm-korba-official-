@@ -44,3 +44,4 @@ class ApiEndpoints {
   // Administration
   static const String actionRegisterStudent = 'REGISTER_STUDENT';
 }
+

@@ -147,3 +147,4 @@ var ChatService = (function() {
     reportMessage: reportMessage
   };
 })();
+

@@ -24,3 +24,4 @@ class AppConstants {
     'mp4', 'mov', 'jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx', 'ppt', 'pptx', 'mp3', 'wav'
   ];
 }
+

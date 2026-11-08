@@ -303,3 +303,4 @@ var QuizService = (function() {
     submitQuizAttempt: submitQuizAttempt
   };
 })();
+

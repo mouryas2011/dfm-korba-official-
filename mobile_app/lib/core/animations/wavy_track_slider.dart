@@ -173,3 +173,4 @@ class _WavyProgressPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _WavyProgressPainter oldDelegate) => true;
 }
+

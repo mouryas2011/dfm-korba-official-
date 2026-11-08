@@ -198,3 +198,4 @@ function buildJsonResponse(success, code, message, data) {
   output.setMimeType(ContentService.MimeType.JSON);
   return output;
 }
+
