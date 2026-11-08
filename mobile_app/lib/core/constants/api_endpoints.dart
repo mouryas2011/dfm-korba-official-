@@ -41,7 +41,22 @@ class ApiEndpoints {
   static const String actionSendMessage = 'SEND_MESSAGE';
   static const String actionReportMessage = 'REPORT_MESSAGE';
 
-  // Administration
+  // Administration & Course Management
   static const String actionRegisterStudent = 'REGISTER_STUDENT';
+  static const String actionCreateCourse = 'CREATE_COURSE';
+  static const String actionUpdateCourse = 'UPDATE_COURSE';
+  static const String actionGetCourses = 'GET_COURSES';
+  static const String actionCreateBatch = 'CREATE_BATCH';
+  static const String actionGetBatches = 'GET_BATCHES';
+  static const String actionCreateTeam = 'CREATE_TEAM';
+  static const String actionCreateCompetition = 'CREATE_COMPETITION';
+  static const String actionGetCompetitions = 'GET_COMPETITIONS';
+  static const String actionUploadStudyMaterial = 'UPLOAD_STUDY_MATERIAL';
+  static const String actionGetStudyMaterials = 'GET_STUDY_MATERIALS';
+  static const String actionGetNotifications = 'GET_NOTIFICATIONS';
+  static const String actionMarkNotificationRead = 'MARK_NOTIFICATION_READ';
+  static const String actionGetActivityLogs = 'GET_ACTIVITY_LOGS';
+  static const String actionConfigureExternalSheetMapping = 'CONFIGURE_EXTERNAL_SHEET_MAPPING';
+  static const String actionImportExternalAttendance = 'IMPORT_EXTERNAL_ATTENDANCE';
 }
 

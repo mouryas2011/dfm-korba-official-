@@ -39,6 +39,20 @@ void main() {
       expect(ApiEndpoints.actionGenerateAiQuiz, 'GENERATE_AI_QUIZ_QUESTIONS');
       expect(ApiEndpoints.actionSendMessage, 'SEND_MESSAGE');
       expect(ApiEndpoints.actionRegisterStudent, 'REGISTER_STUDENT');
+      expect(ApiEndpoints.actionCreateCourse, 'CREATE_COURSE');
+      expect(ApiEndpoints.actionCreateBatch, 'CREATE_BATCH');
+      expect(ApiEndpoints.actionCreateTeam, 'CREATE_TEAM');
+      expect(ApiEndpoints.actionCreateCompetition, 'CREATE_COMPETITION');
+      expect(ApiEndpoints.actionUploadStudyMaterial, 'UPLOAD_STUDY_MATERIAL');
+      expect(ApiEndpoints.actionGetNotifications, 'GET_NOTIFICATIONS');
+      expect(ApiEndpoints.actionGetActivityLogs, 'GET_ACTIVITY_LOGS');
+      expect(ApiEndpoints.actionConfigureExternalSheetMapping, 'CONFIGURE_EXTERNAL_SHEET_MAPPING');
+      expect(ApiEndpoints.actionImportExternalAttendance, 'IMPORT_EXTERNAL_ATTENDANCE');
+    });
+
+    test('Strict No-Certificate and Free Learning policy invariants are enforced', () {
+      expect(AppConstants.appName, isNot(contains('Certificate')));
+      expect(AppConstants.appFullName, isNot(contains('Certification')));
     });
   });
 }

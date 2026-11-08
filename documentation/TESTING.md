@@ -35,6 +35,10 @@ Every core feature undergoes verification across 4 testing dimensions:
 | **REQ-16** | 10 Neumorphic Micro-Animations | Inspect 60fps renders & reduced-motion toggles | Verified |
 | **REQ-17** | Bilingual Support (English & Hindi) | Toggle language in preferences & inspect UI strings | Verified |
 | **REQ-18** | CI/CD GitHub Actions APK build | Run automated workflow on push | Verified |
+| **REQ-19** | Configurable External Sheet Mapping (Owner-Supplied Sheets) | Test dynamic column translation & dual-mirror sync | Verified |
+| **REQ-20** | Chat Safety & Moderation Queue | Verify flagged message review, mute 24h & deletion | Verified |
+| **REQ-21** | Android Release Signing & ProGuard Optimization | Build release APK using keystore config | Verified |
+| **REQ-22** | Native Mock Backend API Server (Offline Device Testing) | Run node mock server and verify endpoints on localhost:3000 | Verified |
 
 ---
 

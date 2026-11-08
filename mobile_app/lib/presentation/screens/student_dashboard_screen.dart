@@ -8,6 +8,10 @@ import '../providers/dashboard_provider.dart';
 import '../widgets/neumorphic_card.dart';
 import 'submit_work_screen.dart';
 import 'student_quiz_screen.dart';
+import 'student_learning_materials_screen.dart';
+import 'student_attendance_log_screen.dart';
+import 'student_profile_screen.dart';
+import 'team_dashboard_screen.dart';
 import 'chat_screen.dart';
 import 'role_selection_screen.dart';
 
@@ -202,7 +206,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                             title: 'My Course',
                             subtitle: courseName,
                             iconColor: AppColors.accentCyan,
-                            onTap: () {},
+                            onTap: () => _showCourseInfoModal(courseName),
                           ),
                           _buildDashboardTile(
                             icon: Icons.task_alt_rounded,
@@ -221,7 +225,11 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                             title: 'Study Material',
                             subtitle: 'PDF, Video, PPT',
                             iconColor: const Color(0xFF8F94FB),
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(context).push(
+                                SmoothPageRoute(page: const StudentLearningMaterialsScreen()),
+                              );
+                            },
                           ),
                           _buildDashboardTile(
                             icon: Icons.psychology_rounded,
@@ -239,14 +247,22 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                             title: 'My Team',
                             subtitle: data['team_name'] ?? 'Veervaan',
                             iconColor: AppColors.accentTeal,
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(context).push(
+                                SmoothPageRoute(page: const TeamDashboardScreen()),
+                              );
+                            },
                           ),
                           _buildDashboardTile(
                             icon: Icons.fact_check_rounded,
                             title: 'Attendance',
                             subtitle: '${data['attendance_pct'] ?? 98.5}% Sync',
                             iconColor: const Color(0xFF00D2FF),
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(context).push(
+                                SmoothPageRoute(page: const StudentAttendanceLogScreen()),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -340,16 +356,79 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
               ],
               onTap: (index) {
                 setState(() => _navIndex = index);
-                if (index == 2) {
+                if (index == 1) {
+                  Navigator.of(context).push(SmoothPageRoute(page: const StudentLearningMaterialsScreen()));
+                } else if (index == 2) {
                   Navigator.of(context).push(SmoothPageRoute(page: const SubmitWorkScreen()));
                 } else if (index == 3) {
                   Navigator.of(context).push(SmoothPageRoute(page: const ChatScreen()));
                 } else if (index == 4) {
-                  _showProfileSheet(auth);
+                  Navigator.of(context).push(SmoothPageRoute(page: const StudentProfileScreen()));
                 }
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showCourseInfoModal(String courseName) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surfaceDarkElevated,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.accentCyan.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.flight_takeoff_rounded, color: AppColors.accentCyan, size: 24),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(courseName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
+                        const SizedBox(height: 2),
+                        const Text('Skill Development Track • 100% Free', style: TextStyle(fontSize: 11, color: AppColors.accentTeal)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Includes 6 curriculum modules: DGCA Flight Safety, Gimbal Dynamics, 4K Cinema Framing, Lighting & Filters, Video Editing & Premiere Pro, and Tournament Filmmaking.',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.4),
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryOrange,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Close Overview', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

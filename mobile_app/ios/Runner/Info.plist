@@ -42,6 +42,8 @@
 	<string>DFM Korba requires camera access for practical video challenges and profile photos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>DFM Korba requires photo library access to upload drone cinematography reels.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>DFM Korba requires microphone access to record audio commentary for drone filmmaking assignments.</string>
 </dict>
 </plist>
 

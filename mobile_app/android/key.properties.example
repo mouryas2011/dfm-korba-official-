@@ -1,0 +1,4 @@
+storePassword=dfm_korba_secret_pass
+keyPassword=dfm_korba_secret_pass
+keyAlias=dfmkorba
+storeFile=dfm_korba_keystore.jks
