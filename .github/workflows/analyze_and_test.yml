@@ -1,0 +1,38 @@
+name: Code Quality & Testing
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  analyze_and_test:
+    name: Flutter Analyze & Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get Dependencies
+        working-directory: mobile_app
+        run: flutter pub get
+
+      - name: Check Formatting
+        working-directory: mobile_app
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Static Code Analysis (Linter)
+        working-directory: mobile_app
+        run: flutter analyze
+
+      - name: Run Test Suite
+        working-directory: mobile_app
+        run: flutter test --coverage

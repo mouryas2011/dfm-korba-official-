@@ -1,0 +1,39 @@
+name: dfm_korba_official
+description: "DFM Korba Official Mobile Application - Skill Development Learning & Competition Management Platform"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  
+  # State Management & Architecture
+  provider: ^6.1.2
+
+  # Networking & HTTP
+  http: ^1.2.1
+
+  # Local Persistence & Caching
+  shared_preferences: ^2.2.3
+
+  # UI & Media
+  intl: ^0.19.0
+  file_picker: ^8.0.0
+  url_launcher: ^6.2.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/dfm_korba_logo.jpg
+    - assets/images/dfm_korba_ui_spec.jpg
