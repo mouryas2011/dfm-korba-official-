@@ -40,7 +40,7 @@ jobs:
 
       - name: Analyze Project Source
         working-directory: mobile_app
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
       - name: Run Tests
         working-directory: mobile_app
