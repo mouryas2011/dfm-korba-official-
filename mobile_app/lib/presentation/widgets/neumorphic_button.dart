@@ -2,26 +2,32 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 
 class NeuButton extends StatelessWidget {
-  final String label;
+  final String? label;
+  final String? text;
   final VoidCallback onPressed;
   final bool isLoading;
   final Gradient? gradient;
   final Color? color;
+  final Color? textColor;
   final IconData? icon;
   final double height;
   final double? width;
 
   const NeuButton({
     Key? key,
-    required this.label,
+    this.label,
+    this.text,
     required this.onPressed,
     this.isLoading = false,
     this.gradient,
     this.color,
+    this.textColor,
     this.icon,
     this.height = 50.0,
     this.width,
   }) : super(key: key);
+
+  String get buttonText => label ?? text ?? '';
 
   @override
   Widget build(BuildContext context) {
@@ -66,9 +72,9 @@ class NeuButton extends StatelessWidget {
                     const SizedBox(width: 8),
                   ],
                   Text(
-                    label,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    buttonText,
+                    style: TextStyle(
+                      color: textColor ?? Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
