@@ -6,6 +6,8 @@ import '../providers/auth_provider.dart';
 import '../providers/dashboard_provider.dart';
 import '../widgets/neumorphic_card.dart';
 import 'admin_register_student_screen.dart';
+import 'admin_course_management_screen.dart';
+import 'admin_chat_moderation_screen.dart';
 import 'role_selection_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -139,7 +141,22 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 title: 'Manage Skill Courses',
                 subtitle: 'Drone Film Making, Mobile Repair, Front Office',
                 color: AppColors.accentCyan,
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(
+                    SmoothPageRoute(page: const AdminCourseManagementScreen()),
+                  );
+                },
+              ),
+              _buildActionItem(
+                icon: Icons.security_rounded,
+                title: 'Chat Moderation & Safety',
+                subtitle: 'Review flagged messages, mute violations',
+                color: AppColors.accentRed,
+                onTap: () {
+                  Navigator.of(context).push(
+                    SmoothPageRoute(page: const AdminChatModerationScreen()),
+                  );
+                },
               ),
               _buildActionItem(
                 icon: Icons.campaign_rounded,

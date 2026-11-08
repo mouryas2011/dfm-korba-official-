@@ -9,6 +9,8 @@ import '../widgets/student_leaderboard_card.dart';
 import '../widgets/student_work_card.dart';
 import '../widgets/neumorphic_card.dart';
 import 'role_selection_screen.dart';
+import 'public_gallery_screen.dart';
+import 'public_leaderboard_screen.dart';
 
 class PublicHomeScreen extends StatefulWidget {
   const PublicHomeScreen({Key? key}) : super(key: key);
@@ -196,6 +198,66 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
                   category: notices[0]['category'] ?? 'GENERAL_NOTICE',
                   onTap: () => _showNoticeDetails(notices[0]),
                 ),
+
+              const SizedBox(height: 12),
+
+              // 4 Quick Action Badges (Courses, Gallery, Top Teams, Top Students)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        icon: Icons.layers_rounded,
+                        label: 'Courses',
+                        color: AppColors.accentCyan,
+                        onTap: () => _showCoursesSheet(courses),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        icon: Icons.photo_library_rounded,
+                        label: 'Gallery',
+                        color: const Color(0xFFC084FC),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            SmoothPageRoute(page: const PublicGalleryScreen()),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        icon: Icons.emoji_events_rounded,
+                        label: 'Top Teams',
+                        color: AppColors.accentGold,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            SmoothPageRoute(page: const PublicLeaderboardScreen()),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        icon: Icons.military_tech_rounded,
+                        label: 'Top Students',
+                        color: AppColors.accentTeal,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            SmoothPageRoute(page: const PublicLeaderboardScreen()),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
 
               // Section 3: Top Team of the Week
               if (topTeam != null)
@@ -412,6 +474,96 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
     );
   }
 
+  Widget _buildQuickActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: NeuCard(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCoursesSheet(List<dynamic> courses) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surfaceDarkElevated,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Available Skill Courses',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: AppColors.textMuted),
+                    onPressed: () => Navigator.of(ctx).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Skill development courses in Korba are 100% free for students.',
+                style: TextStyle(fontSize: 12, color: AppColors.accentTeal),
+              ),
+              const SizedBox(height: 16),
+              ...courses.map((c) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: ListTile(
+                      tileColor: AppColors.surfaceDarkInset,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      leading: const Icon(Icons.flight_takeoff_rounded, color: AppColors.accentCyan),
+                      title: Text(c['course_name'] ?? 'Skill Course', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      subtitle: Text('${c['code'] ?? 'DFM'} • ${c['total_modules'] ?? 6} Modules', style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                      trailing: const Text('FREE', style: TextStyle(color: AppColors.accentTeal, fontWeight: FontWeight.w800, fontSize: 12)),
+                    ),
+                  )),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDrawer() {
     return Drawer(
       backgroundColor: AppColors.surfaceDark,
@@ -439,12 +591,30 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
             ListTile(
               leading: const Icon(Icons.school_rounded, color: AppColors.accentCyan),
               title: const Text('Courses', style: TextStyle(color: Colors.white)),
-              onTap: () => Navigator.of(context).pop(),
+              onTap: () {
+                Navigator.of(context).pop();
+                _showCoursesSheet(courses);
+              },
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_rounded, color: AppColors.accentCyan),
               title: const Text('Student Gallery', style: TextStyle(color: Colors.white)),
-              onTap: () => Navigator.of(context).pop(),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  SmoothPageRoute(page: const PublicGalleryScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.emoji_events_rounded, color: AppColors.accentCyan),
+              title: const Text('Leaderboard', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  SmoothPageRoute(page: const PublicLeaderboardScreen()),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.info_outline_rounded, color: AppColors.accentCyan),
