@@ -301,3 +301,4 @@ class _StudentCompetitionsScreenState extends State<StudentCompetitionsScreen>
     );
   }
 }
+
