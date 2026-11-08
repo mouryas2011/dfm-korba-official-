@@ -73,8 +73,8 @@ class _WavyTrackSliderState extends State<WavyTrackSlider>
           decoration: BoxDecoration(
             color: AppColors.surfaceDarkInset,
             borderRadius: BorderRadius.circular(16),
-            border: Border.parseBorderSide(
-              BorderSide(color: AppColors.borderSubtle.withOpacity(0.5)),
+            border: Border.all(
+              color: AppColors.borderSubtle.withOpacity(0.5),
             ),
             boxShadow: const [
               BoxShadow(

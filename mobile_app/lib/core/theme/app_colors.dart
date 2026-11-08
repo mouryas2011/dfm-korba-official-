@@ -14,6 +14,8 @@ class AppColors {
   static const Color accentTeal = Color(0xFF00E599);
   static const Color accentPurple = Color(0xFF7928CA);
   static const Color accentGold = Color(0xFFFFB800);
+  static const Color accentSilver = Color(0xFFC0C0C0);
+  static const Color accentBronze = Color(0xFFCD7F32);
   static const Color accentRed = Color(0xFFFF3B30);
 
   // Typography Colors
