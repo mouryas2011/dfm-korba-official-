@@ -231,3 +231,4 @@ class _PublicLeaderboardScreenState extends State<PublicLeaderboardScreen> with 
     );
   }
 }
+

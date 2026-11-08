@@ -20,6 +20,7 @@ const requiredBackendFiles = [
   'QuizService.gs',
   'ChatService.gs',
   'ReportingService.gs',
+  'ManagementService.gs',
   'SetupDatabase.gs',
   'appsscript.json'
 ];

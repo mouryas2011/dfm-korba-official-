@@ -135,3 +135,4 @@ class _PublicGalleryScreenState extends State<PublicGalleryScreen> {
     );
   }
 }
+

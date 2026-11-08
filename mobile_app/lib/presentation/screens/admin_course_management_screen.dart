@@ -291,3 +291,4 @@ class _AdminCourseManagementScreenState extends State<AdminCourseManagementScree
     );
   }
 }
+

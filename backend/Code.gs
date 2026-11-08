@@ -172,6 +172,73 @@ function doPost(e) {
         var regResult = AuthService.registerStudent(user, payload);
         return buildJsonResponse(true, 201, "Student registered successfully.", regResult);
 
+      // External Sheet Mapping & Synchronization
+      case 'CONFIGURE_EXTERNAL_SHEET_MAPPING':
+        var mapResult = AttendanceService.configureExternalSheetMapping(user, payload);
+        return buildJsonResponse(true, 200, mapResult.message, mapResult);
+
+      case 'IMPORT_EXTERNAL_ATTENDANCE':
+        var impResult = AttendanceService.importAttendanceFromExternalSheet(user, payload.batch_id, payload.course_id);
+        return buildJsonResponse(true, 200, impResult.message, impResult);
+
+      // Course Management
+      case 'CREATE_COURSE':
+        var cResult = ManagementService.createCourse(user, payload);
+        return buildJsonResponse(true, 201, "Course created successfully.", cResult);
+
+      case 'UPDATE_COURSE':
+        var uResult = ManagementService.updateCourse(user, payload);
+        return buildJsonResponse(true, 200, "Course updated successfully.", uResult);
+
+      case 'GET_COURSES':
+        var cList = ManagementService.getCourses(user);
+        return buildJsonResponse(true, 200, "Courses retrieved.", cList);
+
+      // Batch & Team Management
+      case 'CREATE_BATCH':
+        var bResult = ManagementService.createBatch(user, payload);
+        return buildJsonResponse(true, 201, "Batch created successfully.", bResult);
+
+      case 'GET_BATCHES':
+        var bList = ManagementService.getBatches(user, payload.course_id);
+        return buildJsonResponse(true, 200, "Batches retrieved.", bList);
+
+      case 'CREATE_TEAM':
+        var tmResult = ManagementService.createTeam(user, payload);
+        return buildJsonResponse(true, 201, "Team created successfully.", tmResult);
+
+      // Competitions
+      case 'CREATE_COMPETITION':
+        var cmpResult = ManagementService.createCompetition(user, payload);
+        return buildJsonResponse(true, 201, "Competition created successfully.", cmpResult);
+
+      case 'GET_COMPETITIONS':
+        var cmpList = ManagementService.getCompetitions(user, payload.course_id);
+        return buildJsonResponse(true, 200, "Competitions retrieved.", cmpList);
+
+      // Study Materials
+      case 'UPLOAD_STUDY_MATERIAL':
+        var matResult = ManagementService.uploadStudyMaterial(user, payload);
+        return buildJsonResponse(true, 201, "Study material recorded successfully.", matResult);
+
+      case 'GET_STUDY_MATERIALS':
+        var matList = ManagementService.getStudyMaterials(user, payload.course_id, payload.format);
+        return buildJsonResponse(true, 200, "Study materials retrieved.", matList);
+
+      // Notifications
+      case 'GET_NOTIFICATIONS':
+        var notifList = ManagementService.getUserNotifications(user);
+        return buildJsonResponse(true, 200, "Notifications retrieved.", notifList);
+
+      case 'MARK_NOTIFICATION_READ':
+        var readResult = ManagementService.markNotificationRead(user, payload.notification_id);
+        return buildJsonResponse(true, 200, "Notification marked as read.", readResult);
+
+      // Activity Logs (Admin Audit)
+      case 'GET_ACTIVITY_LOGS':
+        var logs = ManagementService.getActivityLogs(user, payload.limit);
+        return buildJsonResponse(true, 200, "Activity logs retrieved.", logs);
+
       default:
         return buildJsonResponse(false, 400, "Unknown action: " + action, null);
     }
