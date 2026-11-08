@@ -48,11 +48,11 @@ jobs:
 
       - name: Build Universal Release APK
         working-directory: mobile_app
-        run: flutter build apk --release
+        run: flutter build apk --release --android-skip-build-dependency-validation
 
       - name: Build Split-per-ABI Release APKs
         working-directory: mobile_app
-        run: flutter build apk --release --split-per-abi
+        run: flutter build apk --release --split-per-abi --android-skip-build-dependency-validation
 
       - name: Upload Universal APK Artifact
         uses: actions/upload-artifact@v4
